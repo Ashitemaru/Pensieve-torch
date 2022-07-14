@@ -1,5 +1,5 @@
 """
-A basic A + B linear model on CUDA.
+A basic A + B linear model.
 """
 
 import torch
@@ -27,7 +27,7 @@ def train(model, optimizer):
     for _ in tqdm(range(EPOCH)):
         optimizer.zero_grad()
 
-        x = torch.rand(2).cuda()
+        x = torch.rand(2).to(device)
         loss = (model(x) - sum(x)) ** 2
         loss.backward()
 
@@ -37,7 +37,7 @@ def evaluate(model):
     model.eval()
     total_loss = 0
     for _ in tqdm(range(TEST_SIZE)):
-        x = torch.rand(2).cuda()
+        x = torch.rand(2).to(device)
         loss = (model(x) - sum(x)) ** 2
         total_loss += loss.item()
 
@@ -45,7 +45,7 @@ def evaluate(model):
 
 def main():
     # Init
-    model = NaiveModel().cuda()
+    model = NaiveModel().to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr = 1)
 
     # Before training
@@ -62,7 +62,7 @@ def main():
     for param in model.parameters():
         print(param)
 
-    print("PyTorch & CUDA test passed!")
+    print("PyTorch test passed!")
 
 if __name__ == "__main__":
     main()
