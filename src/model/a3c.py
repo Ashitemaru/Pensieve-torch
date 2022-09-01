@@ -1,4 +1,5 @@
 import torch
+
 from config import config
 from model.network import ActorNet, CriticNet
 
@@ -94,7 +95,6 @@ class A3C:
         # TODO: Is this necessary to re-forward?
         critic_loss = self.loss_function(accumulate_reward_batch, self.critic(state_batch)) # Shape: scalar
         critic_loss.backward()
-
 
     def hard_update_actor(self, new_param):
         for tgt_param, src_param in zip(self.actor.parameters(), new_param):

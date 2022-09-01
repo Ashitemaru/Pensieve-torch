@@ -17,3 +17,9 @@ Repository initialization.
 Finish constructing A3C model with PyTorch & constructing the model shown in the paper.
 
 **Copy** training & testing data into the repo.
+
+### 2022.09.01
+
+Complete environment & data loader.
+
+Not fully understand Mahi-Mahi, learn it later.

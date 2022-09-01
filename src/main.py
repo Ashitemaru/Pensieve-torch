@@ -1,8 +1,9 @@
 import torch
 import numpy as np
-from config import config
 import os
-from model.a3c import A3C
+
+from config import config
+from dataloader.loader import load_trace
 
 def main():
     random_seed = config["random_seed"]

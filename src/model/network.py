@@ -1,5 +1,6 @@
 import torch
 import torch.nn.functional as F
+
 from config import config
 
 def create_scalar_conv1d(out_channels, kernel_size):
