@@ -34,15 +34,15 @@ class ABREnvironment:
 
         # Read in video size file
         self.video_size = {}
-        for bitrate_level in range(len(config["bitrate"])):
+        for bitrate_level in range(len(config["video_bitrate"])):
             self.video_size[bitrate_level] = []
-            with open(f"{config['video_size_dir']}/{bitrate_level}", "r") as handle:
+            with open(f"{config['video_size_dir']}/video_size_{bitrate_level}", "r") as handle:
                 for line in handle:
                     self.video_size[bitrate_level].append(int(line.split()[0]))
 
     def get_video_chunk(self, bitrate_level):
         assert bitrate_level >= 0
-        assert bitrate_level < len(config["bitrate"])
+        assert bitrate_level < len(config["video_bitrate"])
 
         video_chunk_size = self.video_size[bitrate_level][self.video_chunk_counter] # In byte
         delay = 0.0 # In ms
@@ -81,8 +81,9 @@ class ABREnvironment:
         # 1. When downloading the new chunk, drain the buffer
         self.buffer_size = np.maximum(self.buffer_size - delay, 0.0)
         # 2. Fill in the new chunk
-        self.buffer_size += config["video_chunk_size"]
+        self.buffer_size += config["video_chunk_len"]
 
+        sleep_time = 0
         if self.buffer_size > config["buffer_threshold"]:
             exceeded_buffer_size = self.buffer_size - config["buffer_threshold"] # In ms
 

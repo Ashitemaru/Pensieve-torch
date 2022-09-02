@@ -26,7 +26,7 @@ def central_agent(net_param_queue_list, experience_queue_list):
 
     # Set up logging
     logging.basicConfig(
-        filename = config["log_dir"] + "/log_central",
+        filename = config["log_dir"] + "/agent_central.log",
         filemode = "w",
         level = logging.INFO,
     )
@@ -66,8 +66,9 @@ def central_agent(net_param_queue_list, experience_queue_list):
 
         # Checkpoint
         if epoch % config["checkpoint_epoch"] == 0:
-            torch.save(central_net.actor.state_dict(), config["model_dir"] + f"actor_{epoch}.pt")
-            torch.save(central_net.critic.state_dict(), config["model_dir"] + f"critic_{epoch}.pt")
+            pass
+            # torch.save(central_net.actor.state_dict(), config["model_dir"] + f"/actor_{epoch}.pt")
+            # torch.save(central_net.critic.state_dict(), config["model_dir"] + f"/critic_{epoch}.pt")
             # TODO: Test model here
 
 def normal_agent(
@@ -203,7 +204,7 @@ def normal_agent(
                     "entropy": entropy_record
                 }
             ])
-            logging.write("\n ========== END ========== \n")
+            logging.write("========== END ==========\n")
 
 if __name__ == "__main__":
     pass

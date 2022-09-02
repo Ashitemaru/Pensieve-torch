@@ -12,7 +12,7 @@ def load_trace():
     for cooked_file_name in cooked_file_name_list:
         cooked_time = []
         cooked_bandwidth = []
-        with open(cooked_trace_dir + cooked_file_name, "rb") as handle:
+        with open(cooked_trace_dir + "/" + cooked_file_name, "rb") as handle:
             for line in handle:
                 data_tuple = line.split()
                 cooked_time.append(float(data_tuple[0]))

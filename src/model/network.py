@@ -89,12 +89,12 @@ class ActorNet(torch.nn.Module):
         """
 
         # First layer
-        bitrate_fc_out = F.relu(self.bitrate_fc(x[:, 0, -1]), inplace = True)
-        buffer_size_fc_out = F.relu(self.buffer_size_fc(x[:, 1, -1]), inplace = True)
-        throughput_conv_out = F.relu(self.throughput_conv(x[:, 2, :]), inplace = True)
-        time_conv_out = F.relu(self.time_conv(x[:, 3, :]), inplace = True)
-        chunk_size_out = F.relu(self.chunk_size_conv(x[:, 4, : self.n_action]), inplace = True)
-        chunk_left_out = F.relu(self.chunk_left_fc(x[:, 5, -1]), inplace = True)
+        bitrate_fc_out = F.relu(self.bitrate_fc(x[:, 0: 1, -1]), inplace = True)
+        buffer_size_fc_out = F.relu(self.buffer_size_fc(x[:, 1: 2, -1]), inplace = True)
+        throughput_conv_out = F.relu(self.throughput_conv(x[:, 2: 3, :]), inplace = True)
+        time_conv_out = F.relu(self.time_conv(x[:, 3: 4, :]), inplace = True)
+        chunk_size_out = F.relu(self.chunk_size_conv(x[:, 4: 5, : self.n_action]), inplace = True)
+        chunk_left_out = F.relu(self.chunk_left_fc(x[:, 5: 6, -1]), inplace = True)
 
         # Flatten to feed into next layer
         throughput_conv_out_flatten = throughput_conv_out.view(throughput_conv_out.shape[0], -1)
@@ -159,12 +159,12 @@ class CriticNet(torch.nn.Module):
         Critic network takes the same input as the actor network.
         """
         # First layer
-        bitrate_fc_out = F.relu(self.bitrate_fc(x[:, 0, -1]), inplace = True)
-        buffer_size_fc_out = F.relu(self.buffer_size_fc(x[:, 1, -1]), inplace = True)
-        throughput_conv_out = F.relu(self.throughput_conv(x[:, 2, :]), inplace = True)
-        time_conv_out = F.relu(self.time_conv(x[:, 3, :]), inplace = True)
-        chunk_size_out = F.relu(self.chunk_size_conv(x[:, 4, : self.n_action]), inplace = True)
-        chunk_left_out = F.relu(self.chunk_left_fc(x[:, 5, -1]), inplace = True)
+        bitrate_fc_out = F.relu(self.bitrate_fc(x[:, 0: 1, -1]), inplace = True)
+        buffer_size_fc_out = F.relu(self.buffer_size_fc(x[:, 1: 2, -1]), inplace = True)
+        throughput_conv_out = F.relu(self.throughput_conv(x[:, 2: 3, :]), inplace = True)
+        time_conv_out = F.relu(self.time_conv(x[:, 3: 4, :]), inplace = True)
+        chunk_size_out = F.relu(self.chunk_size_conv(x[:, 4: 5, : self.n_action]), inplace = True)
+        chunk_left_out = F.relu(self.chunk_left_fc(x[:, 5: 6, -1]), inplace = True)
 
         # Flatten to feed into next layer
         throughput_conv_out_flatten = throughput_conv_out.view(throughput_conv_out.shape[0], -1)

@@ -14,6 +14,8 @@ def main():
     # Create result dir
     if not os.path.exists(config["log_dir"]):
         os.makedirs(config["log_dir"])
+    if not os.path.exists(config["model_dir"]):
+        os.makedirs(config["model_dir"])
 
     # Create the queues for communication
     net_param_queue = []
@@ -29,7 +31,7 @@ def main():
     )
     coordinator.start()
 
-    cooked_time_list, cooked_bandwidth_list, _, _ = load_trace()
+    cooked_time_list, cooked_bandwidth_list, _ = load_trace()
     agent_list = []
     for i in range(config["n_agent"]):
         agent_list.append(torch.multiprocessing.Process(
