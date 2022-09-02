@@ -1,10 +1,12 @@
 import torch
 import logging
 import numpy as np
+import matplotlib.pyplot as plt
 
 from config import config
 from env.environment import ABREnvironment
 from model.a3c import A3C
+from test.model_test import model_test
 
 # Helper variables
 B_IN_KB = 1000
@@ -12,13 +14,14 @@ B_IN_MB = 1000000
 KB_IN_MB = 1000
 MILLISECOND_IN_SECOND = 1000
 
-def evaluate_model(actor_model):
-    pass
+# Global record
+g_avg_reward_list = []
 
 def central_agent(net_param_queue_list, experience_queue_list):
     """
     'net_param_queue_list' & 'experience_queue_list' is shared by central agent & other agents.
     """
+    global g_avg_reward_list
     torch.set_num_threads(1) # TODO: Understand it!
 
     assert len(net_param_queue_list) == config["n_agent"]
@@ -63,13 +66,20 @@ def central_agent(net_param_queue_list, experience_queue_list):
         avg_reward = total_reward / config["n_agent"]
         avg_entropy = total_entropy / total_batch_len
         logging.info(f"Epoch: {epoch}, AVG reward: {avg_reward}, AVG entropy: {avg_entropy}")
+        g_avg_reward_list.append(avg_reward)
 
         # Checkpoint
         if epoch % config["checkpoint_epoch"] == 0:
-            pass
-            # torch.save(central_net.actor.state_dict(), config["model_dir"] + f"/actor_{epoch}.pt")
+            print(f"TRAIN DATASET CHECK, Epoch: {epoch}, AVG reward: {avg_reward}, AVG entropy: {avg_entropy}")
+            torch.save(central_net.actor.state_dict(), config["model_dir"] + f"/actor_{epoch}.pt")
             # torch.save(central_net.critic.state_dict(), config["model_dir"] + f"/critic_{epoch}.pt")
-            # TODO: Test model here
+            model_test(config["model_dir"] + f"/actor_{epoch}.pt", epoch)
+
+    plt.figure()
+    plt.plot(g_avg_reward_list)
+    plt.xlabel("Epoch")
+    plt.ylabel("Average Reward")
+    plt.savefig(config["image_dir"] + "/train_avg_reward.png")
 
 def normal_agent(
     net_param_queue,
@@ -118,7 +128,6 @@ def normal_agent(
             reward_batch = []
             entropy_record = []
 
-            # 1 is the batch_size
             state = torch.zeros((1, config["video_param_count"], config["past_video_chunk_num"]))
 
             # Interact with the environment, get info

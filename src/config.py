@@ -3,9 +3,11 @@ config = {
 
     # Directory config
     "cooked_trace_dir": "../data/cooked_traces",
+    "cooked_test_trace_dir": "../data/cooked_test_traces",
     "video_size_dir": "../data/video_size",
     "model_dir": "../model",
     "log_dir": "../log",
+    "image_dir": "../image",
 
     # Video config
     "video_bitrate": [300, 750, 1200, 1850, 2850, 4300], # In k-byte per sec
@@ -29,7 +31,7 @@ config = {
     "default_entropy_weight": 0.5,
     "n_agent": 4,
     "total_epoch": 30000,
-    "checkpoint_epoch": 100,
+    "checkpoint_epoch": 500,
     "train_batch_len": 100,
 
     # Reward config

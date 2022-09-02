@@ -2,8 +2,8 @@ import os
 
 from config import config
 
-def load_trace():
-    cooked_trace_dir = config["cooked_trace_dir"]
+def load_trace(is_test):
+    cooked_trace_dir = config["cooked_test_trace_dir"] if is_test else config["cooked_trace_dir"]
     cooked_file_name_list = os.listdir(cooked_trace_dir)
 
     cooked_time_list = []
