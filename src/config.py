@@ -4,10 +4,11 @@ config = {
     # Directory config
     "cooked_trace_dir": "../data/cooked_traces",
     "video_size_dir": "../data/video_size",
+    "model_dir": "../model",
     "log_dir": "../log",
 
     # Video config
-    "video_bitrate": [300, 750, 1200, 1850, 2850, 4300], # In Kbps
+    "video_bitrate": [300, 750, 1200, 1850, 2850, 4300], # In k-byte per sec
     "video_param_count": 6,
     "past_video_chunk_num": 8,
     "packet_payload_portion": 0.95,
@@ -18,6 +19,8 @@ config = {
     "buffer_threshold": 60000, # In ms
     "drain_buffer_sleep_time": 500, # In ms
     "total_video_chunk": 48,
+    "default_bitrate_level": 1,
+    "buffer_size_norm_factor": 10, # In sec
 
     # RL config
     "actor_default_lr": 1e-4,
@@ -26,6 +29,12 @@ config = {
     "default_entropy_weight": 0.5,
     "n_agent": 4,
     "total_epoch": 30000,
+    "checkpoint_epoch": 100,
+    "train_batch_len": 100,
+
+    # Reward config
+    "rebuf_penalty": 4.3, # 1 sec rebuffer -> 3 M-byte per sec
+    "smooth_penalty": 1,
 
     # Network config
     "conv_kernel_size": 4,
