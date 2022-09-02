@@ -19,7 +19,7 @@ class A3C:
         self.gamma = reward_decay
         self.beta = entropy_weight
         self.is_central = is_central
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.actor = ActorNet(
             n_feature = self.n_feature,
@@ -53,7 +53,7 @@ class A3C:
     def select_action(self, state):
         if not self.is_central:
             with torch.no_grad():
-                action_prob = self.actor(state)
+                action_prob = self.actor(state.to(self.device))
                 prob_generator = torch.distributions.Categorical(action_prob)
                 return prob_generator.sample().item()
         else:
@@ -80,10 +80,10 @@ class A3C:
 
         # Calc TD error
         with torch.no_grad():
-            value_batch = self.critic(state_batch).to(self.device) # Shape: (batch_size, )
+            value_batch = self.critic(state_batch.to(self.device)).to(self.device) # Shape: (batch_size, )
         td_error_batch = accumulate_reward_batch - value_batch # Shape: (batch_size, )
 
-        action_prob = self.actor(state_batch) # Shape: (batch_size, n_action)
+        action_prob = self.actor(state_batch.to(self.device)) # Shape: (batch_size, n_action)
         prob_generator = torch.distributions.Categorical(action_prob)
         log_action_prob = prob_generator.log_prob(action_batch) # Shape: (batch_size, )
         actor_loss_base = torch.sum(log_action_prob * (-td_error_batch)) # Shape: scalar
@@ -93,7 +93,10 @@ class A3C:
         actor_loss.backward()
 
         # TODO: Is this necessary to re-forward?
-        critic_loss = self.loss_function(accumulate_reward_batch, self.critic(state_batch)) # Shape: scalar
+        critic_loss = self.loss_function(
+            accumulate_reward_batch,
+            self.critic(state_batch.to(self.device))
+        ) # Shape: scalar
         critic_loss.backward()
 
     def hard_update_actor(self, new_param):
