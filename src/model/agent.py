@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from config import config
 from env.environment import ABREnvironment
 from model.a3c import A3C
-from test.model_test import model_test
+from model_test import model_test
 
 # Helper variables
 B_IN_KB = 1000
@@ -66,18 +66,17 @@ def central_agent(net_param_queue_list, experience_queue_list):
         avg_reward = total_reward / config["n_agent"]
         avg_entropy = total_entropy / total_batch_len
         logging.info(f"Epoch: {epoch}, AVG reward: {avg_reward}, AVG entropy: {avg_entropy}")
-        g_avg_reward_list.append(avg_reward)
 
         # Checkpoint
         if epoch % config["checkpoint_epoch"] == 0:
             print(f"TRAIN DATASET CHECK, Epoch: {epoch}, AVG reward: {avg_reward}, AVG entropy: {avg_entropy}")
             torch.save(central_net.actor.state_dict(), config["model_dir"] + f"/actor_{epoch}.pt")
             # torch.save(central_net.critic.state_dict(), config["model_dir"] + f"/critic_{epoch}.pt")
-            model_test(config["model_dir"] + f"/actor_{epoch}.pt", epoch)
+            g_avg_reward_list.append(model_test(config["model_dir"] + f"/actor_{epoch}.pt", epoch))
 
     plt.figure()
     plt.plot(g_avg_reward_list)
-    plt.xlabel("Epoch")
+    plt.xlabel(f"Epoch (divided by {config['checkpoint_epoch']})")
     plt.ylabel("Average Reward")
     plt.savefig(config["image_dir"] + "/train_avg_reward.png")
 
@@ -96,6 +95,7 @@ def normal_agent(
     environment = ABREnvironment(
         cooked_time_list,
         cooked_bandwidth_list,
+        is_fixed = False,
         random_seed = agent_id, # Use different seeds for every agent
     )
 

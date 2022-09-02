@@ -12,10 +12,12 @@ class ABREnvironment:
         self,
         cooked_time_list,
         cooked_bandwidth_list,
+        is_fixed,
         random_seed = config["random_seed"]
     ):
         assert len(cooked_time_list) == len(cooked_bandwidth_list)
         np.random.seed(random_seed)
+        self.is_fixed = is_fixed
 
         self.cooked_time_list = cooked_time_list
         self.cooked_bandwidth_list = cooked_bandwidth_list
@@ -23,13 +25,19 @@ class ABREnvironment:
         self.video_chunk_counter = 0 # Index
         self.buffer_size = 0 # In ms
 
-        # Randomly pick a net trace
-        self.random_trace_id = np.random.randint(len(self.cooked_time_list))
+        # Pick a net trace
+        if self.is_fixed:
+            self.random_trace_id = 0
+        else:
+            self.random_trace_id = np.random.randint(len(self.cooked_time_list))
         self.cooked_time = self.cooked_time_list[self.random_trace_id] # In sec
         self.cooked_bandwidth = self.cooked_bandwidth_list[self.random_trace_id] # In M-bit per sec
 
-        # Randomly pick a start point of net trace
-        self.time_ptr = np.random.randint(1, len(self.cooked_time)) # Index
+        # Pick a start point of net trace
+        if self.is_fixed:
+            self.time_ptr = 1 # Index
+        else:
+            self.time_ptr = np.random.randint(1, len(self.cooked_time)) # Index
         self.last_mahimahi_time = self.cooked_time[self.time_ptr - 1] # In sec
 
         # Read in video size file
@@ -73,7 +81,8 @@ class ABREnvironment:
                 self.last_mahimahi_time = 0
 
         delay += config["link_round_trip_time"] # Add RTT
-        delay *= np.random.uniform(config["noise_lower_bound"], config["noise_upper_bound"]) # Add noise
+        if not self.is_fixed:
+            delay *= np.random.uniform(config["noise_lower_bound"], config["noise_upper_bound"]) # Add noise
 
         rebuf_time = np.maximum(delay - self.buffer_size, 0.0) # Calc re-buffer time
 
@@ -116,13 +125,21 @@ class ABREnvironment:
             self.buffer_size = 0
             self.video_chunk_counter = 0
 
-            # Randomly pick a new net trace
-            random_trace_id = np.random.randint(len(self.cooked_time_list))
-            self.cooked_time = self.cooked_time_list[random_trace_id] # In sec
-            self.cooked_bandwidth = self.cooked_bandwidth_list[random_trace_id] # In M-bit per sec
+            # Pick a new net trace
+            if self.is_fixed:
+                self.random_trace_id += 1
+                if self.random_trace_id >= len(self.cooked_time_list):
+                    self.random_trace_id = 0
+            else:
+                self.random_trace_id = np.random.randint(len(self.cooked_time_list))
+            self.cooked_time = self.cooked_time_list[self.random_trace_id] # In sec
+            self.cooked_bandwidth = self.cooked_bandwidth_list[self.random_trace_id] # In M-bit per sec
 
-            # Randomly pick a start point of net trace
-            self.time_ptr = np.random.randint(1, len(self.cooked_time)) # Index
+            # Pick a start point of net trace
+            if self.is_fixed:
+                self.time_ptr = 1 # Index
+            else:
+                self.time_ptr = np.random.randint(1, len(self.cooked_time)) # Index
             self.last_mahimahi_time = self.cooked_time[self.time_ptr - 1] # In sec
 
         next_chunk_size_list = []

@@ -23,3 +23,9 @@ Finish constructing A3C model with PyTorch & constructing the model shown in the
 Complete environment & data loader.
 
 Not fully understand Mahi-Mahi, learn it later.
+
+### 2022.09.02
+
+Complete test.
+
+All the experiment results are stored in `/summary` folder.

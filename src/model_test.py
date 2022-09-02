@@ -22,7 +22,7 @@ def model_test(actor_model_path, epoch):
     cooked_bandwidth_list, \
     cooked_file_name_list = load_trace(is_test = True)
 
-    environment = ABREnvironment(cooked_time_list, cooked_bandwidth_list)
+    environment = ABREnvironment(cooked_time_list, cooked_bandwidth_list, is_fixed = True)
 
     # Set up logging
     if not os.path.exists(config["log_dir"] + f"/epoch_{epoch}_test"):
@@ -150,6 +150,8 @@ def model_test(actor_model_path, epoch):
     reward_logging.write(f"Total AVG Reward: {total_reward / total_chunk}\n")
     print(f"CHECKPOINT TEST OVER, Epoch: {epoch}, Total AVG Reward: {total_reward / total_chunk}\n")
     reward_logging.close()
+
+    return total_reward / total_chunk
 
 if __name__ == "__main__":
     pass
