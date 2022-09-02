@@ -159,7 +159,6 @@ class CriticNet(torch.nn.Module):
         Critic network takes the same input as the actor network.
         """
         # First layer
-        print(x.shape())
         bitrate_fc_out = F.relu(self.bitrate_fc(x[:, 0: 1, -1]), inplace = True)
         buffer_size_fc_out = F.relu(self.buffer_size_fc(x[:, 1: 2, -1]), inplace = True)
         throughput_conv_out = F.relu(self.throughput_conv(x[:, 2: 3, :]), inplace = True)
