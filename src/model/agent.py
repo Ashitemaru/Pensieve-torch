@@ -2,6 +2,7 @@ import torch
 import logging
 import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 from config import config
 from env.environment import ABREnvironment
@@ -41,7 +42,7 @@ def central_agent(net_param_queue_list, experience_queue_list):
         n_action = len(config["video_bitrate"]),
     )
 
-    for epoch in range(config["total_epoch"]):
+    for epoch in tqdm(range(1, config["total_epoch"] + 1)):
         # Push the central agent params to all the normal agents
         central_actor_param = list(central_net.actor.parameters())
         for agent_id in range(config["n_agent"]):
@@ -74,11 +75,12 @@ def central_agent(net_param_queue_list, experience_queue_list):
             # torch.save(central_net.critic.state_dict(), config["model_dir"] + f"/critic_{epoch}.pt")
             g_avg_reward_list.append(model_test(config["model_dir"] + f"/actor_{epoch}.pt", epoch))
 
-    plt.figure()
-    plt.plot(g_avg_reward_list)
-    plt.xlabel(f"Epoch (divided by {config['checkpoint_epoch']})")
-    plt.ylabel("Average Reward")
-    plt.savefig(config["image_dir"] + "/train_avg_reward.png")
+        if epoch % config["img_checkpoint_epoch"] == 0:
+            plt.figure()
+            plt.plot(g_avg_reward_list)
+            plt.xlabel(f"Epoch (divided by {config['checkpoint_epoch']})")
+            plt.ylabel("Average Reward")
+            plt.savefig(config["image_dir"] + f"/train_avg_reward_{epoch}.png")
 
 def normal_agent(
     net_param_queue,
@@ -213,7 +215,7 @@ def normal_agent(
                     "entropy": entropy_record
                 }
             ])
-            logging.write("========== END ==========\n")
+            logging.truncate(0)
 
 if __name__ == "__main__":
     pass

@@ -30,8 +30,9 @@ config = {
     "default_reward_decay": 0.99,
     "default_entropy_weight": 0.5,
     "n_agent": 4,
-    "total_epoch": 10000,
-    "checkpoint_epoch": 500,
+    "total_epoch": 100000,
+    "checkpoint_epoch": 1000,
+    "img_checkpoint_epoch": 5000,
     "train_batch_len": 100,
 
     # Reward config
