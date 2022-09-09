@@ -12,12 +12,14 @@ class A3C:
         actor_lr = config["actor_default_lr"],
         critic_lr = config["critic_default_lr"],
         reward_decay = config["default_reward_decay"],
-        entropy_weight = config["default_entropy_weight"],
+        init_entropy_weight = config["default_entropy_weight"],
+        entropy_decay = config["entropy_decay"],
     ):
         self.n_feature = n_feature
         self.n_action = n_action
         self.gamma = reward_decay
-        self.beta = entropy_weight
+        self.beta = init_entropy_weight
+        self.beta_decay = entropy_decay
         self.is_central = is_central
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -111,6 +113,9 @@ class A3C:
 
             self.critic_optimizer.step()
             self.critic_optimizer.zero_grad()
+
+    def decay_entropy(self):
+        self.beta *= self.beta_decay
 
 if __name__ == "__main__":
     pass

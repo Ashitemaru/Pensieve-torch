@@ -77,7 +77,7 @@ def model_test(actor_model_path, epoch):
         
         # Log reward
         if file_name not in reward_map:
-            reward_map[file_name] = [reward]
+            reward_map[file_name] = [] # Ignore the first reward signal
         else:
             reward_map[file_name].append(reward)
 

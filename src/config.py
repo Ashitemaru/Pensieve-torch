@@ -29,9 +29,10 @@ config = {
     "critic_default_lr": 1e-3,
     "default_reward_decay": 0.99,
     "default_entropy_weight": 0.5,
+    "entropy_decay": 1,
     "n_agent": 4,
     "total_epoch": 100000,
-    "checkpoint_epoch": 1000,
+    "checkpoint_epoch": 500,
     "img_checkpoint_epoch": 5000,
     "train_batch_len": 100,
 

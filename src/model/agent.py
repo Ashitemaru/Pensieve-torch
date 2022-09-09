@@ -81,6 +81,9 @@ def central_agent(net_param_queue_list, experience_queue_list):
             plt.xlabel(f"Epoch (divided by {config['checkpoint_epoch']})")
             plt.ylabel("Average Reward")
             plt.savefig(config["image_dir"] + f"/train_avg_reward_{epoch}.png")
+        
+        # Decay entropy every epoch
+        central_net.decay_entropy()
 
 def normal_agent(
     net_param_queue,
