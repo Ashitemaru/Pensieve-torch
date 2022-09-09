@@ -3,6 +3,7 @@ import logging
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import os
 
 from config import config
 from env.environment import ABREnvironment
@@ -18,7 +19,14 @@ MILLISECOND_IN_SECOND = 1000
 # Global record
 g_avg_reward_list = []
 
-def central_agent(net_param_queue_list, experience_queue_list):
+def central_agent(
+    net_param_queue_list,
+    experience_queue_list,
+    init_entropy_weight = config["default_entropy_weight"],
+    entropy_decay = config["entropy_decay"],
+    total_epoch = config["total_epoch"],
+    checkpoint_epoch = config["checkpoint_epoch"],
+):
     """
     'net_param_queue_list' & 'experience_queue_list' is shared by central agent & other agents.
     """
@@ -27,6 +35,8 @@ def central_agent(net_param_queue_list, experience_queue_list):
 
     assert len(net_param_queue_list) == config["n_agent"]
     assert len(experience_queue_list) == config["n_agent"]
+
+    print(f"Create A3C with init entropy: {init_entropy_weight}, decay: {entropy_decay}")
 
     # Set up logging
     logging.basicConfig(
@@ -40,9 +50,11 @@ def central_agent(net_param_queue_list, experience_queue_list):
         is_central = True,
         n_feature = [config["video_param_count"], config["past_video_chunk_num"]],
         n_action = len(config["video_bitrate"]),
+        init_entropy_weight = init_entropy_weight,
+        entropy_decay = entropy_decay,
     )
 
-    for epoch in tqdm(range(1, config["total_epoch"] + 1)):
+    for epoch in tqdm(range(1, total_epoch + 1)):
         # Push the central agent params to all the normal agents
         central_actor_param = list(central_net.actor.parameters())
         for agent_id in range(config["n_agent"]):
@@ -69,7 +81,7 @@ def central_agent(net_param_queue_list, experience_queue_list):
         logging.info(f"Epoch: {epoch}, AVG reward: {avg_reward}, AVG entropy: {avg_entropy}")
 
         # Checkpoint
-        if epoch % config["checkpoint_epoch"] == 0:
+        if epoch % checkpoint_epoch == 0:
             print(f"TRAIN DATASET CHECK, Epoch: {epoch}, AVG reward: {avg_reward}, AVG entropy: {avg_entropy}")
             torch.save(central_net.actor.state_dict(), config["model_dir"] + f"/actor_{epoch}.pt")
             # torch.save(central_net.critic.state_dict(), config["model_dir"] + f"/critic_{epoch}.pt")
@@ -91,6 +103,7 @@ def normal_agent(
     agent_id,
     cooked_time_list,
     cooked_bandwidth_list,
+    total_epoch = config["total_epoch"],
 ):
     """
     'net_param_queue' & 'experience_queue' is shared by central agent & other agents.
@@ -119,7 +132,7 @@ def normal_agent(
         )
 
         time_stamp = 0
-        for epoch in range(config["total_epoch"]):
+        for epoch in range(total_epoch):
             # Pull params from central agent
             actor_param = net_param_queue.get()
             agent_net.hard_update_actor(actor_param)
@@ -188,7 +201,7 @@ def normal_agent(
                 # Calc the reward
                 # Based on the bitrate, then cut off all the penalty
                 reward = bitrate_list[bitrate_level] / KB_IN_MB \
-                    - config["rebuf_penalty"] * (1 if rebuf else 0) \
+                    - config["rebuf_penalty"] * rebuf \
                     - config["smooth_penalty"] * np.abs(
                         bitrate_list[bitrate_level] - bitrate_list[last_bitrate_level]
                     ) / KB_IN_MB

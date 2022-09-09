@@ -21,7 +21,7 @@ class A3C:
         self.beta = init_entropy_weight
         self.beta_decay = entropy_decay
         self.is_central = is_central
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cpu")
 
         self.actor = ActorNet(
             n_feature = self.n_feature,
